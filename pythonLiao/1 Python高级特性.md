@@ -1,4 +1,4 @@
-# Python高级特性
+# （笔记）1 Python高级特性
 
 > [Python高级特性 - 廖雪峰](https://www.liaoxuefeng.com/wiki/1016959663602400/1017269809315232)
 
@@ -14,7 +14,7 @@ Python支持 `L[-1]` 取倒数第一个元素，而且支持倒数切片（逆�
 
 甚至什么都不写，只写`[:]`就可以原样复制一个list
 
-**练习题**：`1_1_Slice.py`
+### 练习：`1_1_Slice.py`
 
 利用切片操作，实现一个`trim()`函数，去除字符串首尾的空格，注意不要调用`str`的`strip()`方法：
 
@@ -79,7 +79,7 @@ False
 2 C
 ```
 
-**练习题**：`2_2_For.py`
+### 练习：`1_2_For.py`
 
 请使用迭代查找一个`list`中最小和最大值，并返回一个`tuple`：
 
@@ -115,3 +115,93 @@ else:
     print('测试成功!')
 ```
 
+## 3. 列表生成式
+
+列表生成式即List Comprehensions
+
+如果要**生成`[1x1, 2x2, 3x3, ..., 10x10]`**怎么做？
+
+```python
+>>> [x * x for x in range(1, 11)]
+[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+```
+
+**for循环后面还可以加上if判断**，这样我们就可以筛选出仅偶数的平方：
+
+```python
+>>> [x * x for x in range(1, 11) if x % 2 == 0]
+[4, 16, 36, 64, 100]
+```
+
+还可以**使用两层循环**，可以生成全排列：
+
+```python
+>>> [m + n for m in 'ABC' for n in 'XYZ']
+['AX', 'AY', 'AZ', 'BX', 'BY', 'BZ', 'CX', 'CY', 'CZ']
+```
+
+使用列表生成式的时候，有些童鞋经常搞不清楚**`if...else`的用法**
+
+例如，以下代码正常输出偶数：
+
+```python
+>>> [x for x in range(1, 11) if x % 2 == 0]
+[2, 4, 6, 8, 10]
+```
+
+**情况1：**但是，我们不能在最后的`if`加上`else`：
+
+```python
+>>> [x for x in range(1, 11) if x % 2 == 0 else 0]
+  File "<stdin>", line 1
+    [x for x in range(1, 11) if x % 2 == 0 else 0]
+                                              ^
+SyntaxError: invalid syntax
+```
+
+**这是因为跟在`for`后面的`if`是一个筛选条件，不能带`else`**，否则如何筛选？
+
+**情况2：**另一些童鞋发现把`if`写在`for`前面必须加`else`，否则报错：
+
+```python
+>>> [x if x % 2 == 0 for x in range(1, 11)]
+  File "<stdin>", line 1
+    [x if x % 2 == 0 for x in range(1, 11)]
+                       ^
+SyntaxError: invalid syntax
+```
+
+**这是因为`for`前面的部分是一个表达式，它必须根据`x`计算出一个结果。**
+
+因此，考察表达式：`x if x % 2 == 0`，它无法根据`x`计算出结果，因为缺少`else`，必须加上`else`：
+
+```python
+>>> [x if x % 2 == 0 else -x for x in range(1, 11)]
+[-1, 2, -3, 4, -5, 6, -7, 8, -9, 10]
+```
+
+上述`for`前面的表达式`x if x % 2 == 0 else -x`才能根据`x`计算出确定的结果。
+
+**小结：**
+
+可见，在一个列表生成式中，`for`前面的`if ... else`是表达式，而`for`后面的`if`是过滤条件，不能带`else`。
+
+### 练习：`1_3_list.py`
+
+如果list中既包含字符串，又包含整数，由于非字符串类型没有`lower()`方法，所以列表生成式会报错：
+
+请修改列表生成式，通过添加`if`语句保证列表生成式能正确地执行：
+
+```python
+# -*- coding: utf-8 -*-
+L1 = ['Hello', 'World', 18, 'Apple', None]
+# L2 = [x.lower() if isinstance(x, str) else x for x in L1]
+L2 = [x.lower() for x in L1 if isinstance(x, str)]
+```
+
+```python
+['hello', 'world', 'apple']
+测试通过!
+```
+
+## 4. 生成器
